@@ -12,6 +12,9 @@
                    // contained.
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 /**************************************************************************
  * Private Variables
@@ -71,24 +74,39 @@ bool get_command(command_t* cmd, FILE* in) {
  * @param argv argument vector from the command line
  * @return program exit status
  */
-int main(int argc, char** argv) { 
+int main(int argc, char** argv) {
   command_t cmd; //< Command holder argument
-  
+
   start();
-  
+
   puts("Welcome to Quash!");
-  puts("Type \"exit\" to quit");
+  puts("Type \"exit\" or \"quit\" to quit");
 
   // Main execution loop
-  while (is_running() && get_command(&cmd, stdin)) {
+  /*while (is_running() && get_command(&cmd, stdin)) {
     // NOTE: I would not recommend keeping anything inside the body of
     // this while loop. It is just an example.
 
     // The commands should be parsed, then executed.
     if (!strcmp(cmd.cmdstr, "exit"))
       terminate(); // Exit Quash
-    else 
+    else
       puts(cmd.cmdstr); // Echo the input string
+  }*/
+
+  char inputString[1024];
+
+  while(1){
+
+    printf("Quash>");
+    gets(inputString);
+    puts(inputString);
+
+    if(strcmp(inputString, "exit") == 0 || strcmp(inputString, "quit") == 0){
+      printf("Goodbye.\n");
+      return EXIT_SUCCESS;
+    }
+
   }
 
   return EXIT_SUCCESS;
