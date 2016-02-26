@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define PATH "/bin/bash"
+#define HOME "/bin/bash"
+
 /**************************************************************************
  * Private Variables
  **************************************************************************/
@@ -98,7 +101,7 @@ int main(int argc, char** argv) {
 
   while(1){
 
-    printf("Quash>");
+    printf("$");
     gets(inputString);
     puts(inputString);
 
