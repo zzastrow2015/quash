@@ -6,7 +6,7 @@
 
 /**************************************************************************
  * Included Files
- **************************************************************************/ 
+ **************************************************************************/
 #include "quash.h" // Putting this above the other includes allows us to ensure
                    // this file's headder's #include statements are self
                    // contained.
@@ -31,7 +31,7 @@
 static bool running;
 
 /**************************************************************************
- * Private Functions 
+ * Private Functions
  **************************************************************************/
 /**
  * Start the main loop by setting the running flag to true
@@ -41,7 +41,7 @@ static void start() {
 }
 
 /**************************************************************************
- * Public Functions 
+ * Public Functions
  **************************************************************************/
 bool is_running() {
   return running;
@@ -63,7 +63,7 @@ bool get_command(command_t* cmd, FILE* in) {
     }
     else
       cmd->cmdlen = len;
-    
+
     return true;
   }
   else
@@ -77,6 +77,28 @@ bool get_command(command_t* cmd, FILE* in) {
  * @param argv argument vector from the command line
  * @return program exit status
  */
+
+ void setPathOrHome(char* input){
+
+   char* token1 = strtok(input, " ");
+   token1 = strtok(NULL, " ");
+
+   char* token2 = strtok(token1, "=");
+
+   while (token2) {
+    printf("token: %s\n", token2);
+    token2 = strtok(NULL, " ");
+}
+
+
+
+   printf("testing\n");
+
+ }
+
+
+
+
 int main(int argc, char** argv) {
   command_t cmd; //< Command holder argument
 
@@ -101,13 +123,21 @@ int main(int argc, char** argv) {
 
   while(1){
 
-    printf("$");
+    printf("$ ");
     gets(inputString);
-    puts(inputString);
 
     if(strcmp(inputString, "exit") == 0 || strcmp(inputString, "quit") == 0){
       printf("Goodbye.\n");
       return EXIT_SUCCESS;
+    }else if(strncmp(inputString, "set", 3) == 0){
+
+      char setter[1024];
+      strcpy(setter, inputString);
+
+      setPathOrHome(setter);
+
+    }else{
+      puts(inputString);
     }
 
   }
