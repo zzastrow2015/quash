@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <errno.h>
 
 
 /**************************************************************************
@@ -131,6 +133,10 @@ bool get_command(command_t* cmd, FILE* in) {
 
  void execute(char* input, char** env){
 
+   pid_t quashPipe;
+   int pipeEnds[2];
+   int status;
+
    char* token = strtok(input, " ");
    char** arguments = (char**)malloc(32*sizeof(char*));
    int x = 0;
@@ -142,7 +148,37 @@ bool get_command(command_t* cmd, FILE* in) {
      x++;
    }
 
-  execvpe(arguments[0], &arguments, env);
+   pipe(pipeEnds);
+
+   quashPipe = fork();
+
+   if(quashPipe < 0){
+     printf("Error forking child.\n");
+     return EXIT_FAILURE;
+
+   }else if(quashPipe == 0){
+
+     dup2(pipeEnds[1], STDOUT_FILENO);
+
+     close(pipeEnds[0]);
+     close(pipeEnds[1]);
+
+     if(execvpe(arguments[0], arguments, env) < 0){
+       printf("Error opening program.\n");
+     }
+
+   }
+
+   close(pipeEnds[0]);
+   close(pipeEnds[1]);
+
+   if ((waitpid(quashPipe, &status, 0)) == -1) {
+     fprintf(stderr, "Process encountered an error. ERROR%d", errno);
+     return EXIT_FAILURE;
+   }
+
+   return EXIT_SUCCESS;
+
 
  }
 
