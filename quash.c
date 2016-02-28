@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define PATH "/bin/bash"
-#define HOME "/bin/bash"
 
 /**************************************************************************
  * Private Variables
@@ -29,6 +27,7 @@
 // compilation unit (this file and all files that include it). This is similar
 // to private in other languages.
 static bool running;
+
 
 /**************************************************************************
  * Private Functions
@@ -85,21 +84,72 @@ bool get_command(command_t* cmd, FILE* in) {
 
    char* token2 = strtok(token1, "=");
 
-   while (token2) {
-    printf("token: %s\n", token2);
-    token2 = strtok(NULL, " ");
-}
+   if(strcmp(token2, "PATH") == 0){
+     token2 = strtok(NULL, " ");
+
+     setenv("PATH", token2, 1);
+
+     char* testPath = getenv("PATH");
+
+     printf(testPath);
+     printf("\n");
+   }else if(strcmp(token2, "HOME") == 0){
+     token2 = strtok(NULL, " ");
+
+     setenv("HOME", token2, 1);
+
+     char* testHome = getenv("HOME");
+
+     printf(testHome);
+     printf("\n");
+   }else{
+     printf("Error parsing set function. Please use proper format.");
+   }
 
 
 
-   printf("testing\n");
+
+ }
+
+ void printEcho(char* input){
+
+   char* token = strtok(input, " ");
+   token = strtok(NULL, " ");
+
+   if(strcmp(token, "$PATH") == 0){
+     printf(getenv("PATH"));
+     printf("\n");
+   }else if(strcmp(token, "$HOME") == 0){
+     printf(getenv("HOME"));
+     printf("\n");
+   }else{
+     printf(token);
+     printf("\n");
+   }
+
+ }
+
+ void execute(char* input, char** env){
+
+   char* token = strtok(input, " ");
+   char** arguments = (char**)malloc(32*sizeof(char*));
+   int x = 0;
+
+   while(token != NULL){
+     arguments[x] = (char*)malloc(50*sizeof(char));
+     arguments[x] = token;
+     token = strtok(NULL, " ");
+     x++;
+   }
+
+  execvpe(arguments[0], &arguments, env);
 
  }
 
 
 
 
-int main(int argc, char** argv) {
+int main(int argc, char *argv[], char *envp[]) {
   command_t cmd; //< Command holder argument
 
   start();
@@ -136,8 +186,10 @@ int main(int argc, char** argv) {
 
       setPathOrHome(setter);
 
+    }else if(strncmp(inputString, "echo", 4) == 0){
+      printEcho(inputString);
     }else{
-      puts(inputString);
+      execute(inputString, envp);
     }
 
   }
